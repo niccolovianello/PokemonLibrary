@@ -98,8 +98,8 @@ actor APIHelper {
         let request = URLRequest(url: finalUrl)
         let (data, response) = try await URLSession.shared.data(for: request)
         
-        // Simulate delayed response
-        try await Task.sleep(nanoseconds: 2_000_000_000)
+//        Simulate delayed response
+//        try await Task.sleep(nanoseconds: 2_000_000_000)
         
         guard let response = response as? HTTPURLResponse,
               (200..<300).contains(response.statusCode) else {
