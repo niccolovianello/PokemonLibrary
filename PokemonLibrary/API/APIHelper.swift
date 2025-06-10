@@ -39,6 +39,11 @@ actor APIHelper {
             
             return components.url
         }
+        
+        func buildURL(appending toAppend: String) -> URL? {
+            return components
+                .url?.appending(component: toAppend)
+        }
     }
     
     func fetchPage(pageIndex: Int = 0, limit: Int = 20) async throws -> [PokemonResult]? {
@@ -58,20 +63,13 @@ actor APIHelper {
             throw APIError.invalidResponse
         }
         
-        do {
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            let result = try decoder.decode(Response.self, from: data)
-            return result.results
-        } catch let error {
-            print("Could not decode JSON: \(error)")
-            throw error
-        }
+        return try decode(Response.self, data, decodingStrategy: .convertFromSnakeCase).results
     }
     
-    func fetchPokemon(urlString: String?) async throws -> Pokemon {
-        guard let urlString,
-              let finalUrl = URL(string: urlString) else {
+    func fetchPokemon(named name: String) async throws -> Pokemon {
+        let finalUrl = URLBuilder().buildURL(appending: name)
+        
+        guard let finalUrl else {
             throw URLError(.badURL)
         }
         
@@ -79,15 +77,7 @@ actor APIHelper {
             throw APIError.invalidResponse
         }
         
-        do {
-            let decoder = JSONDecoder()
-            decoder.keyDecodingStrategy = .convertFromSnakeCase
-            let result = try decoder.decode(Pokemon.self, from: data)
-            return result
-        } catch let error {
-            print("Could not decode JSON: \(error)")
-            throw error
-        }
+        return try decode(Pokemon.self, data, decodingStrategy: .convertFromSnakeCase)
     }
     
     private func buildParams(_ params: [String: String]) -> QueryParams {
@@ -107,6 +97,18 @@ actor APIHelper {
         }
         
         return data
+    }
+    
+    private func decode<T: Decodable>(_ type: T.Type = T.self, _ data: Data, decodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys) throws -> T {
+        do {
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = decodingStrategy
+            let result = try decoder.decode(T.self, from: data)
+            return result
+        } catch let error {
+            print("Could not decode JSON: \(error)")
+            throw error
+        }
     }
     
 }
