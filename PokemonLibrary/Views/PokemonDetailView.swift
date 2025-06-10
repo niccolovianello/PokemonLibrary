@@ -11,7 +11,7 @@ import SwiftUI
 @Observable
 final class PokemonDetailViewModel {
     
-    enum LoadingState: Equatable {
+    enum LoadingState {
         case idle
         case loading
         case success
