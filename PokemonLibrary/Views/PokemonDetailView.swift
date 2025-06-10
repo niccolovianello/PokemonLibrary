@@ -11,11 +11,25 @@ import SwiftUI
 @Observable
 final class PokemonDetailViewModel {
     
+    enum LoadingState: Equatable {
+        case idle
+        case loading
+        case success
+        case failed
+    }
+    
     let apiHelper = APIHelper()
     var pokemon: Pokemon?
+    var loadingState: LoadingState = .idle
     
-    func getPokemon(urlString: String?) async throws {
-        pokemon = try await apiHelper.fetchPokemon(urlString: urlString)
+    func getPokemon(name: String) async throws {
+        loadingState = .loading
+        do {
+            pokemon = try await apiHelper.fetchPokemon(named: name)
+            loadingState = .success
+        } catch {
+            loadingState = .failed
+        }
     }
     
 }
@@ -23,28 +37,40 @@ final class PokemonDetailViewModel {
 struct PokemonDetailView: View {
     
     @State private var viewModel = PokemonDetailViewModel()
-    
-    var urlString: String?
+    var name: String
     
     var body: some View {
-        VStack {
-            if let pokemon = viewModel.pokemon,
-               let imageUrl = pokemon.sprites.other?.officialArtwork.frontShiny {
-                ZStack {
-                    Rectangle()
-                        .foregroundColor(.green)
-                        .ignoresSafeArea()
+        ZStack {
+            Rectangle()
+                .foregroundColor(randomColor())
+                .ignoresSafeArea()
+            
+            switch viewModel.loadingState {
+                case .idle:
+                EmptyView()
+            case .loading:
+                ProgressView()
+            case .success:
+                if let pokemon = viewModel.pokemon,
+                   let imageUrl = pokemon.sprites.other?.officialArtwork.frontDefault {
                     
                     ImageLoaderView(url: imageUrl, size: 260)
                 }
+            case .failed:
+                ErrorView(message: "A Pokémon with this name doesn't exist!")
             }
         }
         .task {
-            try? await viewModel.getPokemon(urlString: urlString)
+            try? await viewModel.getPokemon(name: name)
         }
+    }
+    
+    func randomColor() -> Color {
+        print("Generating random color...")
+        return Color(.sRGB, red: .random(in: 0...1), green: .random(in: 0...1), blue: .random(in: 0...1))
     }
 }
 
 #Preview {
-    PokemonDetailView()
+    PokemonDetailView(name: "bulbasaur")
 }
