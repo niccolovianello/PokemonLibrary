@@ -43,7 +43,7 @@ actor APIHelper {
     
     func fetchPage(pageIndex: Int = 0, limit: Int = 20) async throws -> [PokemonResult]? {
         
-        let params = buildParams(params: [
+        let params = buildParams([
             "limit": "\(limit)",
             "offset": "\(pageIndex * limit)"
         ])
@@ -90,7 +90,7 @@ actor APIHelper {
         }
     }
     
-    private func buildParams(params: [String: String]) -> QueryParams {
+    private func buildParams(_ params: [String: String]) -> QueryParams {
         QueryParams(params: params)
     }
     
