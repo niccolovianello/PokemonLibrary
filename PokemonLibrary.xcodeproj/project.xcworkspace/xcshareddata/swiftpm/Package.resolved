@@ -1,0 +1,15 @@
+{
+  "originHash" : "7b6ff81fbb34cd23f9831e6651811ff8e8d0c8052d617abd6d5a3dfe0132f0c2",
+  "pins" : [
+    {
+      "identity" : "nicksui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/niccolovianello/NicksUI",
+      "state" : {
+        "revision" : "aba3cce6342bc48264f050826b7808eff02cfd8c",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}
