@@ -134,7 +134,7 @@ struct PokemonListView: View {
                         .navigationDestination(for: String.self) { name in
                             PokemonDetailView(name: name)
                         }
-                        .sheet(isPresented: $isPokemonDetailViewPresented) {
+                        .navigationDestination(isPresented: $isPokemonDetailViewPresented) {
                             PokemonDetailView(name: viewModel.searchText)
                         }
                         .scrollIndicators(.hidden)
